@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khảo sát nhu cầu chăm sóc sức khỏe cá nhân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F6F5;
+    --surface:#FFFFFF;
+    --ink:#16302B;
+    --muted:#5E7871;
+    --primary:#1F6F5C;
+    --primary-dark:#164F41;
+    --primary-soft:#E4F0EB;
+    --accent:#D98E3B;
+    --border:#DDE6E2;
+    --danger:#C24545;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+  }
+  .wrap{
+    max-width:680px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  header.hero{
+    text-align:center;
+    padding:12px 0 28px;
+  }
+  header.hero .eyebrow{
+    display:inline-block;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--primary);
+    background:var(--primary-soft);
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:14px;
+    font-weight:600;
+  }
+  header.hero h1{
+    font-size:clamp(24px,4.2vw,32px);
+    color:var(--ink);
+  }
+  header.hero p{
+    color:var(--muted);
+    max-width:480px;
+    margin:10px auto 0;
+    font-size:15px;
+  }
+
+  /* Stepper */
+  .stepper{
+    display:flex;
+    gap:6px;
+    margin:28px 0 8px;
+  }
+  .stepper .seg{
+    flex:1;
+    height:5px;
+    border-radius:999px;
+    background:var(--border);
+    overflow:hidden;
+  }
+  .stepper .seg .fill{
+    height:100%;
+    width:0%;
+    background:var(--primary);
+    transition:width .4s ease;
+  }
+  .step-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    color:var(--muted);
+    margin-bottom:26px;
+  }
+  .step-label b{color:var(--primary);font-weight:600;}
+
+  /* Card */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:28px 26px;
+    box-shadow:0 1px 2px rgba(22,48,43,0.04);
+  }
+  .step{display:none;}
+  .step.active{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .step .part-eyebrow{
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .step h2{font-size:20px; margin-bottom:20px;}
+
+  .question{margin-bottom:26px;}
+  .question:last-child{margin-bottom:0;}
+  .question label.q-title{
+    display:block;
+    font-weight:600;
+    font-size:15px;
+    margin-bottom:10px;
+  }
+  .question .hint{
+    display:block;
+    font-weight:400;
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .req{color:var(--danger); margin-left:2px;}
+
+  .options{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:11px 14px;
+    cursor:pointer;
+    font-size:14.5px;
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover{border-color:var(--primary);}
+  .opt input{accent-color:var(--primary); width:16px; height:16px; flex-shrink:0;}
+  .opt.checked{border-color:var(--primary); background:var(--primary-soft);}
+
+  .scale-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .scale-opt{
+    flex:1;
+    min-width:44px;
+    text-align:center;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 4px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+  }
+  .scale-opt input{display:none;}
+  .scale-opt.checked{background:var(--primary); border-color:var(--primary); color:#fff;}
+  .scale-caption{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-top:6px;}
+
+  textarea, input[type=text], input[type=tel], input[type=email]{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:11px 13px;
+    font-family:inherit;
+    font-size:14.5px;
+    color:var(--ink);
+    resize:vertical;
+    background:#fff;
+  }
+  textarea{min-height:80px;}
+  input:focus, textarea:focus{outline:2px solid var(--primary); outline-offset:1px;}
+
+  .other-input{margin-top:8px;}
+
+  .max-note{font-size:12px; color:var(--accent); margin-top:6px; font-weight:500;}
+
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:26px;
+  }
+  button{
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    border-radius:999px;
+    padding:12px 22px;
+    border:none;
+    cursor:pointer;
+    transition:background .15s, opacity .15s;
+  }
+  .btn-primary{background:var(--primary); color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-ghost{background:transparent; color:var(--muted); padding:12px 8px;}
+  .btn-ghost:hover{color:var(--ink);}
+  .btn-primary:disabled{opacity:.5; cursor:not-allowed;}
+
+  .error-msg{color:var(--danger); font-size:12.5px; margin-top:8px; display:none;}
+  .error-msg.show{display:block;}
+
+  /* Thank you */
+  #doneScreen{display:none; text-align:center; padding:50px 20px;}
+  #doneScreen .check{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--primary-soft); color:var(--primary);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 18px; font-size:26px;
+  }
+  #doneScreen h2{font-size:22px;}
+  #doneScreen p{color:var(--muted); font-size:14.5px; max-width:420px; margin:8px auto 0;}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:34px;
+  }
+
+  @media (max-width:480px){
+    .card{padding:22px 18px;}
+    .scale-opt{font-size:13px; padding:9px 3px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Khảo sát người tiêu dùng</span>
+    <h1>Nhu cầu &amp; thói quen chăm sóc sức khỏe cá nhân</h1>
+    <p>Chia sẻ của Anh/Chị giúp chúng tôi hiểu rõ hơn cách mọi người chăm sóc sức khỏe bản thân mỗi ngày. Mất khoảng 7–10 phút, mọi thông tin đều được bảo mật.</p>
+  </header>
+
+  <div class="stepper" id="stepperBar"></div>
+  <div class="step-label"><span>Bước <b id="stepNow">1</b> / 6</span><span id="stepPartName">Sàng lọc</span></div>
+
+  <form class="card" id="surveyForm" novalidate>
+
+    <!-- STEP 1 -->
+    <div class="step active" data-step="1">
+      <div class="part-eyebrow">Phần 1</div>
+      <h2>Thông tin sàng lọc &amp; nhân khẩu học</h2>
+
+      <div class="question" data-required="true" data-type="radio" data-name="gioi_tinh">
+        <label class="q-title">1. Giới tính của Anh/Chị? <span class="req">*</span></label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="gioi_tinh" value="Nam">Nam</label>
+          <label class="opt"><input type="radio" name="gioi_tinh" value="Nữ">Nữ</label>
+          <label class="opt"><input type="radio" name="gioi_tinh" value="Khác">Khác</label>
+        </div>
+      </div>
+
+      <div class="question" data-required="true" data-type="radio" data-name="do_tuoi">
+        <label class="q-title">2. Độ tuổi của Anh/Chị? <span class="req">*</span></label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="do_tuoi" value="Dưới 18">Dưới 18</label>
+          <label class="opt"><input type="radio" name="do_tuoi" value="18–24">18–24</label>
+          <label class="opt"><input type="radio" name="do_tuoi" value="25–34">25–34</label>
+          <label class="opt"><input type="radio" name="do_tuoi" value="35–44">35–44</label>
+          <label class="opt"><input type="radio" name="do_tuoi" value="45–54">45–54</label>
+          <label class="opt"><input type="radio" name="do_tuoi" value="Trên 54">Trên 54</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <label class="q-title" for="noi_o">3. Anh/Chị hiện đang sinh sống tại?</label>
+        <input type="text" id="noi_o" name="noi_o" placeholder="VD: Nha Trang, Khánh Hòa">
+      </div>
+
+      <div class="question" data-required="true" data-type="radio" data-name="nguoi_quyet_dinh">
+        <label class="q-title">4. Anh/Chị có phải người trực tiếp quyết định mua sản phẩm chăm sóc sức khỏe cho bản thân không? <span class="req">*</span></label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="nguoi_quyet_dinh" value="Có, tôi tự quyết định">Có, tôi tự quyết định</label>
+          <label class="opt"><input type="radio" name="nguoi_quyet_dinh" value="Có nhưng tham khảo người khác">Có nhưng tham khảo người khác (gia đình, bác sĩ...)</label>
+          <label class="opt"><input type="radio" name="nguoi_quyet_dinh" value="Không, người khác quyết định giúp tôi">Không, người khác quyết định giúp tôi</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" data-step="2">
+      <div class="part-eyebrow">Phần 2</div>
+      <h2>Thói quen chăm sóc sức khỏe hiện tại</h2>
+
+      <div class="question" data-type="checkbox" data-name="van_de_suc_khoe">
+        <label class="q-title">5. Trong 6 tháng qua, Anh/Chị đã từng gặp vấn đề sức khỏe nào dưới đây? <span class="hint">Có thể chọn nhiều đáp án</span></label>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Mệt mỏi, thiếu năng lượng">Mệt mỏi, thiếu năng lượng</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Đau nhức xương khớp, cơ bắp">Đau nhức xương khớp, cơ bắp</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Rối loạn tiêu hóa">Rối loạn tiêu hóa</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Mất ngủ, căng thẳng">Mất ngủ, căng thẳng (stress)</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Cảm cúm, ho, viêm họng">Cảm cúm, ho, viêm họng</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Vấn đề về da">Vấn đề về da (mụn, dị ứng...)</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Tăng/giảm cân ngoài ý muốn">Tăng/giảm cân ngoài ý muốn</label>
+          <label class="opt"><input type="checkbox" name="van_de_suc_khoe" value="Vấn đề về mắt">Vấn đề về mắt</label>
+        </div>
+        <input type="text" class="other-input" name="van_de_suc_khoe_khac" placeholder="Khác (nếu có)...">
+      </div>
+
+      <div class="question" data-type="radio" data-name="hanh_dong_dau_tien">
+        <label class="q-title">6. Khi gặp vấn đề sức khỏe, Anh/Chị thường làm gì đầu tiên?</label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="hanh_dong_dau_tien" value="Tự tìm hiểu trên mạng/mạng xã hội">Tự tìm hiểu thông tin trên mạng/mạng xã hội</label>
+          <label class="opt"><input type="radio" name="hanh_dong_dau_tien" value="Tự mua thuốc tại nhà thuốc">Tự mua thuốc/sản phẩm không cần kê đơn tại nhà thuốc</label>
+          <label class="opt"><input type="radio" name="hanh_dong_dau_tien" value="Hỏi người thân, bạn bè">Hỏi ý kiến người thân, bạn bè</label>
+          <label class="opt"><input type="radio" name="hanh_dong_dau_tien" value="Đặt lịch khám bác sĩ/bệnh viện">Đặt lịch khám bác sĩ/đi bệnh viện, phòng khám</label>
+          <label class="opt"><input type="radio" name="hanh_dong_dau_tien" value="Dùng app tư vấn sức khỏe online">Sử dụng ứng dụng tư vấn sức khỏe trực tuyến</label>
+          <label class="opt"><input type="radio" name="hanh_dong_dau_tien" value="Không làm gì, để tự khỏi">Không làm gì, để tự khỏi</label>
+        </div>
+        <input type="text" class="other-input" name="hanh_dong_dau_tien_khac" placeholder="Khác (nếu có)...">
+      </div>
+
+      <div class="question" data-type="scale" data-name="muc_do_chu_dong">
+        <label class="q-title">7. Mức độ chủ động của Anh/Chị trong việc chăm sóc sức khỏe bản thân?</label>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="muc_do_chu_dong" value="1">1</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_chu_dong" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_chu_dong" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_chu_dong" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_chu_dong" value="5">5</label>
+        </div>
+        <div class="scale-caption"><span>Hoàn toàn bị động</span><span>Rất chủ động</span></div>
+      </div>
+
+      <div class="question" data-type="radio" data-name="tan_suat_su_dung">
+        <label class="q-title">8. Tần suất Anh/Chị sử dụng sản phẩm chăm sóc sức khỏe (TPCN, vitamin, dụng cụ y tế tại nhà...)?</label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="tan_suat_su_dung" value="Hàng ngày">Hàng ngày</label>
+          <label class="opt"><input type="radio" name="tan_suat_su_dung" value="Vài lần/tuần">Vài lần/tuần</label>
+          <label class="opt"><input type="radio" name="tan_suat_su_dung" value="Vài lần/tháng">Vài lần/tháng</label>
+          <label class="opt"><input type="radio" name="tan_suat_su_dung" value="Hiếm khi">Hiếm khi</label>
+          <label class="opt"><input type="radio" name="tan_suat_su_dung" value="Chưa từng sử dụng">Chưa từng sử dụng</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" data-step="3">
+      <div class="part-eyebrow">Phần 3</div>
+      <h2>Nhu cầu &amp; mức độ quan trọng</h2>
+
+      <div class="question" data-type="checkbox" data-name="yeu_to_quan_trong" data-max="3">
+        <label class="q-title">9. Yếu tố nào quan trọng nhất khi Anh/Chị chọn sản phẩm chăm sóc sức khỏe? <span class="hint">Chọn tối đa 3</span></label>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Hiệu quả đã được chứng minh">Hiệu quả đã được chứng minh/kiểm nghiệm</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Thành phần tự nhiên, an toàn">Thành phần tự nhiên, an toàn</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Giá cả hợp lý">Giá cả hợp lý</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Thương hiệu uy tín">Thương hiệu uy tín</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Được bác sĩ/chuyên gia khuyên dùng">Được bác sĩ/chuyên gia khuyên dùng</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Đánh giá tốt từ người dùng khác">Đánh giá tốt từ người dùng khác</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Dễ mua, tiện lợi">Dễ mua, tiện lợi</label>
+          <label class="opt"><input type="checkbox" name="yeu_to_quan_trong" value="Bao bì, mẫu mã đẹp">Bao bì, mẫu mã đẹp</label>
+        </div>
+        <input type="text" class="other-input" name="yeu_to_quan_trong_khac" placeholder="Khác (nếu có)...">
+        <div class="max-note" id="maxNote9" style="display:none;">Anh/Chị đã chọn tối đa 3 mục.</div>
+      </div>
+
+      <div class="question" data-type="checkbox" data-name="kho_khan">
+        <label class="q-title">10. Anh/Chị gặp khó khăn/trở ngại gì khi chăm sóc sức khỏe cho bản thân? <span class="hint">Có thể chọn nhiều đáp án</span></label>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="kho_khan" value="Không đủ thời gian">Không đủ thời gian</label>
+          <label class="opt"><input type="checkbox" name="kho_khan" value="Chi phí cao">Chi phí cao</label>
+          <label class="opt"><input type="checkbox" name="kho_khan" value="Khó tìm sản phẩm/dịch vụ phù hợp">Khó tìm sản phẩm/dịch vụ phù hợp</label>
+          <label class="opt"><input type="checkbox" name="kho_khan" value="Thiếu thông tin đáng tin cậy">Thiếu thông tin đáng tin cậy</label>
+          <label class="opt"><input type="checkbox" name="kho_khan" value="Không biết bắt đầu từ đâu">Không biết bắt đầu từ đâu</label>
+          <label class="opt"><input type="checkbox" name="kho_khan" value="Ngại đến bệnh viện/phòng khám">Ngại đến bệnh viện/phòng khám</label>
+        </div>
+        <input type="text" class="other-input" name="kho_khan_khac" placeholder="Khác (nếu có)...">
+      </div>
+
+      <div class="question">
+        <label class="q-title" for="mong_muon_ly_tuong">11. Nếu có một sản phẩm/dịch vụ chăm sóc sức khỏe lý tưởng, Anh/Chị mong muốn nó đáp ứng được điều gì nhất?</label>
+        <textarea id="mong_muon_ly_tuong" name="mong_muon_ly_tuong" placeholder="Chia sẻ suy nghĩ của Anh/Chị..."></textarea>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" data-step="4">
+      <div class="part-eyebrow">Phần 4</div>
+      <h2>Hành vi tìm kiếm thông tin &amp; mua sắm</h2>
+
+      <div class="question" data-type="checkbox" data-name="kenh_tim_hieu">
+        <label class="q-title">12. Anh/Chị thường tìm hiểu thông tin về sản phẩm chăm sóc sức khỏe qua kênh nào? <span class="hint">Có thể chọn nhiều đáp án</span></label>
+        <div class="options">
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Mạng xã hội">Mạng xã hội (Facebook, TikTok, Instagram...)</label>
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Công cụ tìm kiếm">Công cụ tìm kiếm (Google...)</label>
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Website/app thương mại điện tử">Website/app thương mại điện tử</label>
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Nhà thuốc/quầy tư vấn trực tiếp">Nhà thuốc/quầy tư vấn trực tiếp</label>
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Bác sĩ, chuyên gia y tế">Bác sĩ, chuyên gia y tế</label>
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Người thân, bạn bè giới thiệu">Người thân, bạn bè giới thiệu</label>
+          <label class="opt"><input type="checkbox" name="kenh_tim_hieu" value="Quảng cáo">Quảng cáo (TV, báo, banner...)</label>
+        </div>
+        <input type="text" class="other-input" name="kenh_tim_hieu_khac" placeholder="Khác (nếu có)...">
+      </div>
+
+      <div class="question" data-type="radio" data-name="noi_mua">
+        <label class="q-title">13. Anh/Chị thường mua sản phẩm chăm sóc sức khỏe ở đâu?</label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="noi_mua" value="Nhà thuốc truyền thống">Nhà thuốc truyền thống</label>
+          <label class="opt"><input type="radio" name="noi_mua" value="Chuỗi nhà thuốc lớn">Chuỗi nhà thuốc lớn (Long Châu, Pharmacity...)</label>
+          <label class="opt"><input type="radio" name="noi_mua" value="Siêu thị/cửa hàng tiện lợi">Siêu thị/cửa hàng tiện lợi</label>
+          <label class="opt"><input type="radio" name="noi_mua" value="Sàn thương mại điện tử">Sàn thương mại điện tử (Shopee, Lazada, Tiki...)</label>
+          <label class="opt"><input type="radio" name="noi_mua" value="Website chính hãng">Website chính hãng của thương hiệu</label>
+        </div>
+        <input type="text" class="other-input" name="noi_mua_khac" placeholder="Khác (nếu có)...">
+      </div>
+
+      <div class="question" data-type="radio" data-name="chi_tieu_thang">
+        <label class="q-title">14. Trung bình mỗi tháng, Anh/Chị chi bao nhiêu cho sản phẩm chăm sóc sức khỏe cá nhân?</label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="chi_tieu_thang" value="Dưới 200.000đ">Dưới 200.000đ</label>
+          <label class="opt"><input type="radio" name="chi_tieu_thang" value="200.000đ – 500.000đ">200.000đ – 500.000đ</label>
+          <label class="opt"><input type="radio" name="chi_tieu_thang" value="500.000đ – 1.000.000đ">500.000đ – 1.000.000đ</label>
+          <label class="opt"><input type="radio" name="chi_tieu_thang" value="Trên 1.000.000đ">Trên 1.000.000đ</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" data-step="5">
+      <div class="part-eyebrow">Phần 5</div>
+      <h2>Mức độ hài lòng</h2>
+
+      <div class="question" data-type="scale" data-name="muc_do_hai_long">
+        <label class="q-title">15. Anh/Chị hài lòng như thế nào với sản phẩm/dịch vụ chăm sóc sức khỏe hiện đang sử dụng?</label>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="muc_do_hai_long" value="1">1</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_hai_long" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_hai_long" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_hai_long" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="muc_do_hai_long" value="5">5</label>
+        </div>
+        <div class="scale-caption"><span>Rất không hài lòng</span><span>Rất hài lòng</span></div>
+      </div>
+
+      <div class="question">
+        <label class="q-title" for="khong_hai_long">16. Điều gì khiến Anh/Chị KHÔNG hài lòng nhất (nếu có)?</label>
+        <textarea id="khong_hai_long" name="khong_hai_long" placeholder="Không bắt buộc..."></textarea>
+      </div>
+
+      <div class="question" data-type="scale" data-name="nps">
+        <label class="q-title">17. Anh/Chị có sẵn sàng giới thiệu sản phẩm/dịch vụ đang dùng cho người thân, bạn bè không?</label>
+        <div class="scale-row">
+          <label class="scale-opt"><input type="radio" name="nps" value="0">0</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="1">1</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="2">2</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="3">3</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="4">4</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="5">5</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="6">6</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="7">7</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="8">8</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="9">9</label>
+          <label class="scale-opt"><input type="radio" name="nps" value="10">10</label>
+        </div>
+        <div class="scale-caption"><span>Chắc chắn không</span><span>Chắc chắn có</span></div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step" data-step="6">
+      <div class="part-eyebrow">Phần 6</div>
+      <h2>Thông tin bổ sung <span class="hint" style="font-weight:400;">(không bắt buộc)</span></h2>
+
+      <div class="question">
+        <label class="q-title" for="gop_y">18. Anh/Chị có góp ý gì thêm để cải thiện sản phẩm/dịch vụ chăm sóc sức khỏe hiện nay không?</label>
+        <textarea id="gop_y" name="gop_y" placeholder="Ý kiến của Anh/Chị..."></textarea>
+      </div>
+
+      <div class="question">
+        <label class="q-title">19. Nếu muốn nhận thông tin ưu đãi/quà tặng, Anh/Chị vui lòng để lại:</label>
+        <input type="tel" name="sdt" placeholder="Số điện thoại" style="margin-bottom:8px;">
+        <input type="email" name="email" placeholder="Email">
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg">Vui lòng trả lời các câu hỏi bắt buộc trước khi tiếp tục.</div>
+
+    <div class="nav-row">
+      <button type="button" class="btn-ghost" id="btnBack" style="visibility:hidden;">← Quay lại</button>
+      <button type="button" class="btn-primary" id="btnNext">Tiếp tục →</button>
+      <button type="submit" class="btn-primary" id="btnSubmit" style="display:none;">Gửi khảo sát</button>
+    </div>
+  </form>
+
+  <div id="doneScreen" class="card">
+    <div class="check">✓</div>
+    <h2>Cảm ơn Anh/Chị!</h2>
+    <p>Câu trả lời của Anh/Chị đã được ghi nhận. Ý kiến này rất quý giá và sẽ giúp chúng tôi cải thiện sản phẩm, dịch vụ chăm sóc sức khỏe tốt hơn.</p>
+  </div>
+
+  <footer>Mọi thông tin được bảo mật và chỉ dùng cho mục đích nghiên cứu.</footer>
+</div>
+
+<script>
+  // ====== CẤU HÌNH: dán URL Web App Google Apps Script tại đây ======
+  const APPS_SCRIPT_URL = "DÁN_URL_WEB_APP_APPS_SCRIPT_TẠI_ĐÂY";
+  // ===================================================================
+
+  const partNames = ["Sàng lọc","Thói quen","Nhu cầu","Mua sắm","Hài lòng","Hoàn tất"];
+  const totalSteps = 6;
+  let current = 1;
+
+  const stepperBar = document.getElementById('stepperBar');
+  for(let i=1;i<=totalSteps;i++){
+    const seg = document.createElement('div');
+    seg.className='seg';
+    seg.innerHTML='<div class="fill" id="fill'+i+'"></div>';
+    stepperBar.appendChild(seg);
+  }
+
+  function updateStepper(){
+    for(let i=1;i<=totalSteps;i++){
+      document.getElementById('fill'+i).style.width = (i<=current)?'100%':'0%';
+    }
+    document.getElementById('stepNow').textContent = current;
+    document.getElementById('stepPartName').textContent = partNames[current-1];
+  }
+
+  function showStep(n){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    document.querySelector('.step[data-step="'+n+'"]').classList.add('active');
+    document.getElementById('btnBack').style.visibility = (n===1)?'hidden':'visible';
+    document.getElementById('btnNext').style.display = (n===totalSteps)?'none':'inline-block';
+    document.getElementById('btnSubmit').style.display = (n===totalSteps)?'inline-block':'none';
+    document.getElementById('errorMsg').classList.remove('show');
+    updateStepper();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function validateStep(n){
+    const stepEl = document.querySelector('.step[data-step="'+n+'"]');
+    const requiredQs = stepEl.querySelectorAll('.question[data-required="true"]');
+    for(const q of requiredQs){
+      const type = q.dataset.type;
+      const name = q.dataset.name;
+      if(type==='radio'){
+        if(!q.querySelector('input[name="'+name+'"]:checked')) return false;
+      } else if(type==='checkbox'){
+        if(!q.querySelector('input[name="'+name+'"]:checked')) return false;
+      }
+    }
+    return true;
+  }
+
+  document.getElementById('btnNext').addEventListener('click', ()=>{
+    if(!validateStep(current)){
+      document.getElementById('errorMsg').classList.add('show');
+      return;
+    }
+    current = Math.min(current+1, totalSteps);
+    showStep(current);
+  });
+
+  document.getElementById('btnBack').addEventListener('click', ()=>{
+    current = Math.max(current-1, 1);
+    showStep(current);
+  });
+
+  // Highlight chọn option + giới hạn Q9 tối đa 3
+  document.querySelectorAll('.opt, .scale-opt').forEach(opt=>{
+    const input = opt.querySelector('input');
+    input.addEventListener('change', ()=>{
+      const name = input.name;
+      document.querySelectorAll('input[name="'+name+'"]').forEach(i=>{
+        i.closest('.opt, .scale-opt').classList.toggle('checked', i.checked);
+      });
+    });
+  });
+
+  const q9 = document.querySelector('.question[data-name="yeu_to_quan_trong"]');
+  const q9Boxes = q9.querySelectorAll('input[type="checkbox"]');
+  const q9Max = document.getElementById('maxNote9');
+  q9Boxes.forEach(box=>{
+    box.addEventListener('change', ()=>{
+      const checked = q9.querySelectorAll('input[type="checkbox"]:checked');
+      if(checked.length >= 3){
+        q9Boxes.forEach(b=>{ if(!b.checked) b.disabled = true; });
+        q9Max.style.display='block';
+      } else {
+        q9Boxes.forEach(b=> b.disabled = false );
+        q9Max.style.display='none';
+      }
+    });
+  });
+
+  // Submit
+  document.getElementById('surveyForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!validateStep(current)){
+      document.getElementById('errorMsg').classList.add('show');
+      return;
+    }
+
+    const btnSubmit = document.getElementById('btnSubmit');
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Đang gửi...';
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const params = new URLSearchParams();
+    // Gộp các checkbox nhiều giá trị bằng dấu ";"
+    const multiFields = {};
+    for(const [key, value] of formData.entries()){
+      const inputEl = form.querySelector('[name="'+key+'"]');
+      const isCheckboxGroup = form.querySelectorAll('input[type="checkbox"][name="'+key+'"]').length > 0;
+      if(isCheckboxGroup){
+        if(!multiFields[key]) multiFields[key] = [];
+        multiFields[key].push(value);
+      } else {
+        params.append(key, value);
+      }
+    }
+    for(const key in multiFields){
+      params.append(key, multiFields[key].join('; '));
+    }
+    params.append('timestamp', new Date().toISOString());
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: params
+    }).then(()=>{
+      showDone();
+    }).catch((err)=>{
+      console.warn('Có thể phản hồi bị chặn bởi CORS, nhưng dữ liệu thường vẫn được ghi nhận:', err);
+      showDone();
+    });
+  });
+
+  function showDone(){
+    document.getElementById('surveyForm').style.display='none';
+    document.getElementById('stepperBar').style.display='none';
+    document.querySelector('.step-label').style.display='none';
+    document.getElementById('doneScreen').style.display='block';
+  }
+
+  showStep(current);
+</script>
+</body>
+</html>
